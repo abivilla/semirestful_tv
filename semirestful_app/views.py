@@ -1,5 +1,6 @@
 from django.shortcuts import render, redirect
 from .models import Show
+from django.contrib import messages
 
 # Create your views here.
 def re(request):
@@ -12,12 +13,21 @@ def shows(request):
     return render (request, 'shows.html',context)
 
 def add_show(request):
+    
     if request.method == "GET":
         return render (request, 'add_show.html')
+    
     else:
-        show = Show.objects.create(title=request.POST["title"],network=request.POST["network"],release_date=request.POST["release_date"],desc=request.POST["desc"])
+        errors = Show.objects.basic_validator(request.POST)
+        if len(errors) > 0:
+            for key, value in errors.items():
+                messages.error(request, value)
         
-        return redirect(f'/shows_desc/{show.id}')
+            return redirect('/shows/new')
+        else:
+            show = Show.objects.create(title=request.POST["title"],network=request.POST["network"],release_date=request.POST["release_date"],desc=request.POST["desc"])
+        
+            return redirect(f'/shows_desc/{show.id}')
     
 def shows_desc(request,id):
     show=Show.objects.get(id=id)
@@ -40,9 +50,16 @@ def edit(request,id):
     }
         return render(request,'edit.html', context)
     else:
-        show.title = request.POST["title"]
-        show.network = request.POST["network"]
-        show.release_date = request.POST["release_date"]
-        show.desc= request.POST["desc"]
-        show.save()
-        return redirect(f'/shows_desc/{show.id}')
+        errors = Show.objects.basic_validator(request.POST)
+        if len(errors) > 0:
+            for key, value in errors.items():
+                messages.error(request, value)
+        
+            return redirect(f'/shows/{show.id}/edit')
+        else:
+            show.title = request.POST["title"]
+            show.network = request.POST["network"]
+            show.release_date = request.POST["release_date"]
+            show.desc= request.POST["desc"]
+            show.save()
+            return redirect(f'/shows_desc/{show.id}')

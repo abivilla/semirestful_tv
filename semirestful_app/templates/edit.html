@@ -14,8 +14,16 @@
                     <div class="text-right">
                         <a href="/shows">Go Back</a>
                     </div>
+
+                    {% if messages %}
+                    <ul class="messages">    
+                    {% for message in messages %}    
+                    <li {% if message.tags %} class="{{ message.tags }}"{% endif %}>{{ message }}</li>    
+                    {% endfor %}
+                    </ul>
+                    {% endif %}
                     
-                    <h1>Add a New Show</h1>
+                    <h1>Edit Show</h1>
                     <form class="card-body" action="/shows/{{show.id}}/edit" method="post">
                         {% csrf_token %}
                         <div class="form-group">
