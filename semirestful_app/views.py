@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from .models import Show
 
 # Create your views here.
+def re(request):
+    return redirect('/shows')
 
 def shows(request):
     context = {
